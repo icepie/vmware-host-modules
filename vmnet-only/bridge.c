@@ -44,6 +44,7 @@
 #include <linux/if_arp.h>
 #include <net/tcp.h>
 #include <net/ipv6.h>
+#include <net/gso.h>
 #if !COMPAT_LINUX_VERSION_CHECK_LT(6, 5, 0) || \
     (!defined(SKB_GSO_CB) && !COMPAT_LINUX_VERSION_CHECK_LT(3, 9, 0))
 #include <net/gso.h>
