@@ -74,7 +74,6 @@ extern "C" {
 # if defined (VMKPANIC)
 #  include "vmk_assert.h"
 # else /* !VMKPANIC */
-#  include <linux/kernel.h>
 #  define _ASSERT_PANIC(name) \
            Panic(_##name##Fmt "\n", __FILE__, __LINE__)
 #  define _ASSERT_PANIC_BUG(bug, name) \
@@ -115,7 +114,7 @@ NORETURN void Panic_NoSave(const char *fmt, ...) PRINTF_DECL(1, 2);
    } while(0)
 
 #else /* !VMKPANIC */
-#define Panic panic
+NORETURN void Panic(const char *fmt, ...) PRINTF_DECL(1, 2);
 #endif
 
 void LogThrottled(uint32 *count, const char *fmt, ...) PRINTF_DECL(2, 3);
@@ -265,7 +264,7 @@ void WarningThrottled(uint32 *count, const char *fmt, ...) PRINTF_DECL(2, 3);
 #endif
 
 #define ASSERT_NOT_TESTED(cond) (UNLIKELY(!(cond)) ? NOT_TESTED() : (void)0)
-#define NOT_TESTED_ONCE()       VMWARE_DO_ONCE(NOT_TESTED())
+#define NOT_TESTED_ONCE()       DO_ONCE(NOT_TESTED())
 
 #define NOT_TESTED_1024()                                               \
    do {                                                                 \
@@ -274,7 +273,7 @@ void WarningThrottled(uint32 *count, const char *fmt, ...) PRINTF_DECL(2, 3);
       count = (count + 1) & 1023;                                       \
    } while (0)
 
-#define LOG_ONCE(...) VMWARE_DO_ONCE(Log(__VA_ARGS__))
+#define LOG_ONCE(...) DO_ONCE(Log(__VA_ARGS__))
 
 
 /*

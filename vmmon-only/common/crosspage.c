@@ -75,9 +75,7 @@
 
 #define EXPORTED_ASM_SYMBOL(fn) ".global " ASM_PREFIX #fn "\n"   \
                                 ASM_PREFIX #fn ":\n"
-#ifndef ASM_ENDBR
-#define ASM_ENDBR
-#endif
+#define ENDBR ".byte 0xf3, 0x0f, 0x1e, 0xfa\n"
 
 /*
  * Tag the crosspage code C wrapper with the crosspage section and page
@@ -92,10 +90,6 @@
 #define VMMDATALA(off) (LPN_2_LA(CROSS_PAGE_DATA_START) + (off))
 
 #define NOT_REACHED_MINIMAL __builtin_unreachable
-
-#ifndef ASM_RET
-#define ASM_RET "ret\n"
-#endif
 
 void VmmToHost(void);
 void SwitchDBHandler(void);
@@ -127,7 +121,7 @@ CPDATA const VMCrossPageData cpDataTemplate = {
 
    .monTask.IOMapBase = sizeof(Task64),
 
-   .monGDTR.limit  = VMMON_GDT_LIMIT,
+   .monGDTR.limit  = GDT_LIMIT,
    .monGDTR.offset = GDT_START_VA,
 
    .shadowDR[6].ureg64 = DR6_DEFAULT,
@@ -301,7 +295,7 @@ CrossPage_CodePage(void)
 
    ".p2align 4\n"
    EXPORTED_ASM_SYMBOL(SwitchDBHandler)
-   ASM_ENDBR
+   ENDBR
    "pushq        %%rax\n"
    "call         SwitchExcGetCrossPageData\n"
    "addq         %[wsExceptionDB], %%rax\n"
@@ -340,7 +334,7 @@ CrossPage_CodePage(void)
 
    ".p2align 4\n"
    EXPORTED_ASM_SYMBOL(SwitchUDHandler)
-   ASM_ENDBR
+   ENDBR
    "pushq        %%rax\n"
    "pushq        %%rbx\n"
    "pushq        %%rcx\n"
@@ -409,7 +403,7 @@ CrossPage_CodePage(void)
 
    ".p2align 4\n"
    EXPORTED_ASM_SYMBOL(SwitchNMIHandler)
-   ASM_ENDBR
+   ENDBR
    "pushq        %%rax\n"
    "call         SwitchExcGetCrossPageData\n"
    "addq         %[wsExceptionNMI], %%rax\n"
@@ -445,7 +439,7 @@ CrossPage_CodePage(void)
 
    ".p2align 4\n"
    EXPORTED_ASM_SYMBOL(SwitchMCEHandler)
-   ASM_ENDBR
+   ENDBR
    "pushq        %%rax\n"
    "call         SwitchExcGetCrossPageData\n"
    "addq         %[wsExceptionMC], %%rax\n"
@@ -566,7 +560,7 @@ CrossPage_CodePage(void)
 
    ".p2align 4\n"
    EXPORTED_ASM_SYMBOL(VmmToHost)
-   ASM_ENDBR
+   ENDBR
    "movq            %c[VMMCROSSPAGE] + %c[crosspageDataLA], %%rcx\n"
    /* Create an lret frame on the monitor stack. */
    "pushq           (%%rsp)\n"
@@ -649,7 +643,7 @@ CrossPage_CodePage(void)
    "movq            2(%%rsp),         %%rax\n" /* DTR.offset */
    "addq            $0x10,            %%rsp\n"
    "andq            %[PageAlignMask], %%rax\n"
-   ASM_RET
+   "ret\n"
 
    EXPORTED_ASM_SYMBOL(CrossPage_CodeEnd)
 

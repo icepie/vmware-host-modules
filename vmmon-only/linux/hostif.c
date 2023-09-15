@@ -47,7 +47,6 @@
 #include <asm/io.h>
 #include <asm/page.h>
 #include <asm/uaccess.h>
-#include <asm/irq_vectors.h>
 #include <linux/capability.h>
 #include <linux/kthread.h>
 #include <linux/wait.h>
@@ -2333,8 +2332,7 @@ isVAReadable(VA r)  // IN:
    int ret;
 
    r = APICR_TO_ADDR(r, APICR_VERSION);
-#if defined(HAVE_GET_KERNEL_NOFAULT) || LINUX_VERSION_CODE >= KERNEL_VERSION(5, 17, 0) || \
-    defined(__get_kernel_nofault)
+#if defined(HAVE_GET_KERNEL_NOFAULT) || LINUX_VERSION_CODE >= KERNEL_VERSION(5, 17, 0)
    /*
     * Exists from 5.10, first indicated by HAVE_GET_KERNEL_NOFAULT,
     * and from post-5.17 just existing everywhere.
